@@ -1,122 +1,18 @@
 module SpinQubits
 
-    using LinearAlgebra
-    using Statistics
-    using Distributions
+    using LinearAlgebra, Statistics, Distributions
 
-    const GAMMA = 6.796381511118120480641144794583e-5;
+    import Base: +, *
+    
+    export
+        calculateFidelities,
+        saveFidelities
 
-    mutable struct Spinor
-        spins::Array{Array{Int}}
-        coefficients::Array{Complex}
-    end
+    include("spinors.jl")
+    include("operators.jl")
+    include("utils.jl")
+    include("tensors.jl")
 
-
-    import Base.+
-    import Base.*
-    spinor1 = Spinor([[1,0,0,0]],[1.0])
-    spinor2 = Spinor([[1,1,0,0]],[1.0])
-    function +(spinorA::Spinor, spinorB::Spinor)
-        spinsC = deepcopy(spinorA.spins)
-        coefficientsC = deepcopy(spinorA.coefficients)
-        for (coeffB,spinB) in zip(spinorB.coefficients,spinorB.spins)
-            n = findfirst(isequal(spinB),spinorA.spins)
-            if n !== nothing
-                coefficientsC[n] += coeffB
-            else
-                push!(spinsC,spinB)
-                push!(coefficientsC,coeffB)
-            end
-        end
-        Spinor(spinsC,coefficientsC)         
-    end
-    function *(spinorA::Spinor, spinorB::Spinor)
-        result = 0
-        conj!(spinorA.coefficients)
-        for (coeffA,spinA) in zip(spinorA.coefficients,spinorA.spins)
-            for (coeffB,spinB) in zip(spinorB.coefficients,spinorB.spins)
-                if spinA == spinB
-                    result += coeffA*coeffB
-                end
-            end
-        end
-        result
-    end
-    *(α::Any, spinorB::Spinor) = Spinor(spinorB.spins,α.*spinorB.coefficients)
-    *(spinorB::Spinor, α::Any) = α*spinorB
-    function σx(n::Int,spinor::Spinor)
-        newspinor = deepcopy(spinor)
-        for state in newspinor.spins
-            state[n] = (state[n] + 1) % 2
-        end
-        return newspinor
-    end
-    function σy(n::Int,spinor::Spinor)
-        newspinor = deepcopy(spinor)
-        for (i,state) in enumerate(newspinor.spins)
-            state[n] = (state[n] + 1) % 2
-            newspinor.coefficients[i] *= spinor.spins[i][n] == 1 ? im : -im
-        end
-        return newspinor
-    end
-    function σz(n::Int,spinor::Spinor)
-        newspinor = deepcopy(spinor)
-        for i in 1:length(newspinor.coefficients)
-            newspinor.coefficients[i] *= ((spinor.spins[i][n] == 1) ? 1 : -1)
-        end
-        return newspinor
-    end
-    σiσj(i,j,spinor::Spinor) = σx(i,σx(j, spinor)) + σy(i,σy(j, spinor)) + σz(i,σz(j, spinor))
-    dipoledipole(i,j,spinor::Spinor) = 1/abs(i-j)^3 * ((-1)*σx(i,σx(j, spinor)) + (-1)*σy(i,σy(j, spinor)) + 2*σz(i,σz(j, spinor)))
-
-
-    function getγm(L)
-        h = zeros(2^L,2^L)
-        gamma = GAMMA
-        basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
-        for (i,spinorI) in enumerate(basis)
-            for (j,spinorJ) in enumerate(basis)
-                h[i, j] = sum( [k == l ? 0 : (-1/2*(spinorI*dipoledipole(k,l,spinorJ))) for k in 1:L, l in 1:L] )
-            end
-        end
-        return h
-    end
-
-    function getjtensor(L,β)
-        jTensor = zeros(2^L, 2^L, Int(L*(L-1)/2))
-        gamma = GAMMA
-        basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
-        for (i,spinorI) in enumerate(basis)
-            for (j,spinorJ) in enumerate(basis)
-                baseIndex = 0
-                for k in 1:L-1
-                    for n in 1:L-k
-                        jTensor[i, j, baseIndex + n] = β^(k-1)*spinorI*σiσj(n,n+k,spinorJ)         
-                    end
-                    baseIndex += L-k
-                end
-            end
-        end
-        return jTensor
-    end
-
-    function Ham!(ham,L,jt,γm,jcouplings,γ)
-        @views begin
-            for i in 1:Int(L*(L-1)/2)
-                ham .= ham .+ jcouplings[i].*jt[:,:,i]
-            end
-            ham .= ham .+ γ.*γm
-            nothing
-        end
-    end
-
-    function diagexp!(array, result)
-        for i in 1:length(@view result[:,1])
-            result[i,i] = exp(array[i,i])
-        end
-        nothing
-    end
-        
     function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64)
     
         σJ = sigmas[1]
@@ -125,7 +21,7 @@ module SpinQubits
         j0 = 1.0
         
         jtensor = getjtensor(L,β)
-        γm = getγm(L)
+        γm = getγtensor(L)
         D = zeros(2^L,2^L)
         R = zeros(2^L,2^L) 
 
