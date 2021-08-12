@@ -39,16 +39,16 @@ jobs:
         uses: julia-actions/julia-runtest@v1.6.0
         with:
           # Value determining whether to test with coverage or not. Options: true | false. Default value: true.
-          coverage: # optional, default is true
+          coverage: false # optional, default is true
           # Value passed to the --depwarn flag. Options: yes | no | error. Default value: yes.
-          depwarn: # optional, default is yes
+          depwarn: yes # optional, default is yes
           # If true, then, for each [compat] entry in the active project, only allow the latest compatible version. If the value is auto and the pull request has been opened by Dependabot or CompatHelper, then force_latest_compatible_version will be set to true, otherwise it will be set to false. Options: true | false | auto. Default value: auto.
           force_latest_compatible_version: auto # optional, default is auto
           # Value passed to the --inline flag. Options: yes | no. Default value: yes.
-          inline: # optional, default is yes
+          inline: yes # optional, default is yes
           # Value inserted in front of the julia command, e.g. for running xvfb-run julia [...]
           prefix: # optional, default is 
           # Value passed to the --project flag. The default value is the repository root: "@."
-          project: # optional, default is @.
+          project: @. # optional, default is @.
 
 
