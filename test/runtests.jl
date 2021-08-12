@@ -1,10 +1,10 @@
-using SpinQubits
-using Test
+using SpinQubits, Test
 
-@testset "Fake Tests" begin
-	for i in 1:10
-		@test i == i + 1 - 1
-	end
+
+@testset "Noiseless fidelities" begin
+	@test calculateFidelities(4, 0.00, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0000148240466523175 rtol=1e-8
+	@test calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0018048111455146731 rtol=1e-8
+	@test calculateFidelities(4, 0.05, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0396766971366405 rtol=1e-8
 end
 
 # Testing spinors
