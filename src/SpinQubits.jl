@@ -1,12 +1,10 @@
 module SpinQubits
 
-    using LinearAlgebra, Statistics, Distributions
+    using LinearAlgebra, Statistics, Distributions, Test
 
     import Base: +, *
     
-    export
-        calculateFidelities,
-        saveFidelities
+    export calculateFidelities, saveFidelities
 
     include("spinors.jl")
     include("operators.jl")
@@ -131,7 +129,7 @@ module SpinQubits
         gamString = rpad(DISGAM,4,"0")
         nRealsPrime = maximum(sigmas) == 0 ? 0 : nREALS
         sigString = string("σJ",rpad(sigmas[1],4,"0"),"_","σγ",rpad(sigmas[2],4,"0"),"_","στ",rpad(sigmas[3],4,"0"),"_",lpad(nRealsPrime,5,"0"))
-	    filename = joinpath(pwd(),"jdata",string(L,"_up_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING,".m"))
+	    filename = joinpath(abspath(),"jdata",string(L,"_up_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING,".m"))
         if !isfile(filename) || parse(Int,split(read(`wc -c $filename`, String)," ")[1]) == 0
             println("No file found. Calculating...")
             f = open(filename,"w")
