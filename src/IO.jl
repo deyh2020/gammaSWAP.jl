@@ -41,7 +41,7 @@ function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING;format="mathematica"
     nothing
 end
 
-function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING)
+function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING;format="mathematica")
 
     n = length(range(0.0,3.0,step=SPACING))
     emptyarray = zeros(Float64,n,2)
@@ -50,16 +50,20 @@ function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING)
     nRealsPrime = maximum(sigmas) == 0 ? 0 : nREALS
     sigString = string("σJ",rpad(sigmas[1],4,"0"),"_","σγ",rpad(sigmas[2],4,"0"),"_","στ",rpad(sigmas[3],4,"0"),"_",lpad(nRealsPrime,5,"0"))
 
-    filename = joinpath(pwd(),"jdata",string("julia_",L,"_up_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
+    filename = joinpath(pwd(),"jdata",string(format,"_",L,"_up_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
+    #println(filename)
     if !isfile(filename)
         println("File is missing.")
         return nothing
+    elseif format=="mathematica"
+        plotdata = readmathematica(filename)
+    else
+        f = open(filename,"r")
+        data = read!(f,emptyarray)
+        close(f)
+        plotdata = (data[:,1],data[:,2])
     end
-    f = open(filename,"r")
-    data = read!(f,emptyarray)
-    close(f)
 
-    plotdata = (data[:,1],data[:,2])
 
     plot!(plotdata, scale=:log10, size=(500,500))
     return nothing

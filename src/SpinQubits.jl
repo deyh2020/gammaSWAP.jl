@@ -4,12 +4,13 @@ module SpinQubits
 
     import Base: +, *
     
-    export calculateFidelities, saveFidelities, plotter, readmathematica
+    export calculateFidelities, saveFidelities, plotter!, readmathematica
 
     include("spinors.jl")
     include("operators.jl")
     include("utils.jl")
     include("tensors.jl")
+    include("IO.jl")
 
     function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64)
     
@@ -119,6 +120,4 @@ module SpinQubits
         end # exponents
         return 10 .^exponents,1 .-fidelities
     end
-
-    include("IO.jl")
 end
