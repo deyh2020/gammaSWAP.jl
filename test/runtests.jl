@@ -11,6 +11,7 @@ using SpinQubits, Test
 		#@test calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0018048111455146731 rtol=1e-8
 		#@test calculateFidelities(4, 0.05, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0396766971366405 rtol=1e-8
 	end
+end
 
 
 
