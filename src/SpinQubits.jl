@@ -104,7 +104,6 @@ module SpinQubits
                     Ham!(ham,L,jtensor,γm,js,γ0)
                     
 
-                    println(abs.(round.(ham; digits=6)))
                     eigenObject = eigen!(ham) 
                     D .= Diagonal(eigenObject.values)
                     
