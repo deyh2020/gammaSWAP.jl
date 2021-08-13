@@ -12,7 +12,7 @@ module SpinQubits
     include("tensors.jl")
     include("IO.jl")
 
-    function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64)
+    function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false)
     
         σJ = sigmas[1]
         σγ = sigmas[2]
@@ -35,7 +35,11 @@ module SpinQubits
         exponents = collect(range(0.0,3.0,step=spacing))
         singleExpFidelities = zeros(nIterations)
         fidelities = zeros(length(exponents))
-        sequence = [collect(1:L-1);collect((L-1):-1:1)]
+        if singlet
+            sequence = [collect(2:L-1);collect((L-1):-1:2)]
+        else
+            sequence = [collect(1:L-1);collect((L-1):-1:1)]
+        end
         
         δt = στ*1e-9
         tShortestPetta = 23e-9
@@ -45,13 +49,21 @@ module SpinQubits
 
         numJs = Int(L*(L-1)/2) # n + (n-1) + (n-2) + ... = n(n+1)/2
         js = zeros(numJs) 
-
-        initialSpinKet = [[0]; ones(Int64,L-1)]
+        if singlet
+            initialSpinKets = [ [[1,0]; ones(Int64,L-2)], [[0,1]; ones(Int64,L-2)] ]
+        else
+            initialSpinKet = [[0]; ones(Int64,L-1)]
+        end
         basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
         kets::Array{Array{Int,1},1} = map(x->x.spins[1],basis)
-        
+
         initKet = zeros(2^L)
-        initKet[findfirst(isequal(initialSpinKet),kets)] = 1.0
+        if singlet
+            initKet[findfirst(isequal(initialSpinKets[1]),kets)] = 1.0/sqrt(2)
+            initKet[findfirst(isequal(initialSpinKets[2]),kets)] = -1.0/sqrt(2)
+        else
+            initKet[findfirst(isequal(initialSpinKet),kets)] = 1.0
+        end
         finalKet::Vector{ComplexF64} = deepcopy(initKet)
         currentKet::Vector{ComplexF64} = deepcopy(initKet)
 
