@@ -4,7 +4,7 @@ module SpinQubits
 
     import Base: +, *
     
-    export calculateFidelities, saveFidelities, plotter
+    export calculateFidelities, saveFidelities, plotter, readmathematica
 
     include("spinors.jl")
     include("operators.jl")
@@ -82,25 +82,22 @@ module SpinQubits
                 end
 
                 for swapIndex in sequence
-                    for m in 1:2^L
-                        for n in 1:2^L
-                        U[m,n] = 0.0
-                        ham[m,n] = 0.0 
-                        end
-                    end
+                    zeros!(U)
+                    zeros!(ham)
                     currentKet .= finalKet
-
                     js[:] .= @view j0s[:,i]
+
                     baseIndex = 0
                     for k in 1:L-1 # k is the interspin distance
                         if swapIndex <= L-k
                             js[baseIndex + swapIndex] *= jSWAP/j0
                         end
-                        if swapIndex > k && k > 1
-                            js[baseIndex + (swapIndex - k)] *= jSWAP/j0
+                        if swapIndex > (k-1) && k > 1
+                            js[baseIndex + (swapIndex - (k-1))] *= jSWAP/j0
                         end
                         baseIndex += L-k
                     end
+
                     Ham!(ham,L,jtensor,γm,js,γ0)
                     
 
@@ -115,7 +112,6 @@ module SpinQubits
                     
                     mul!(trueU,U,udiss) # ham here is just used as dummy memory space, not the hamiltonian
                     mul!(finalKet,trueU,currentKet)
-                    
                 end # sequence
                 singleExpFidelities[i] = abs2(initKet'*finalKet)           
             end # average
@@ -124,60 +120,5 @@ module SpinQubits
         return 10 .^exponents,1 .-fidelities
     end
 
-
-    function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING;format="mathematica")
-
-        gamString = rpad(DISGAM,4,"0")
-        nRealsPrime = maximum(sigmas) == 0 ? 0 : nREALS
-        sigString = string("σJ",rpad(sigmas[1],4,"0"),"_","σγ",rpad(sigmas[2],4,"0"),"_","στ",rpad(sigmas[3],4,"0"),"_",lpad(nRealsPrime,5,"0"))
-
-        filename = joinpath(pwd(),"jdata",string(format,"_",L,"_up_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
-
-        if isfile(filename) && parse(Int,split(strip(read(`wc -c $filename`, String))," ")[1]) > 0
-            println("File already found. Skipping.")
-        else
-            println("No file found. Calculating...")
-            f = open(filename,"w")
-            theseExponents = collect(range(0.0,3.0,step=SPACING))
-            data = calculateFidelities(L,BETA,0.0,DISGAM,sigmas,nREALS,SPACING)
-            println("Done.")
-            if format=="mathematica"
-                # Mathematica plotting format
-                print(f, "{")
-                for i in 1:length(theseExponents)
-                    print(f,"{",data[1][i],",",replace(string(data[2][i]),"e"=>"*^"),"}")
-                    i == length(theseExponents) ? print(f,"}") : print(f,",")
-                end
-            elseif format == "julia"
-                # Julia plotting format
-                write(f, data[1], data[2])
-            end
-            close(f)
-        end
-        nothing
-    end
-
-    function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING)
-
-        n = length(range(0.0,3.0,step=SPACING))
-        emptyarray = zeros(Float64,n,2)
-
-        gamString = rpad(DISGAM,4,"0")
-        nRealsPrime = maximum(sigmas) == 0 ? 0 : nREALS
-        sigString = string("σJ",rpad(sigmas[1],4,"0"),"_","σγ",rpad(sigmas[2],4,"0"),"_","στ",rpad(sigmas[3],4,"0"),"_",lpad(nRealsPrime,5,"0"))
-
-        filename = joinpath(pwd(),"jdata",string("julia_",L,"_up_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
-        if !isfile(filename)
-            println("File is missing.")
-            return nothing
-        end
-        f = open(filename,"r")
-        data = read!(f,emptyarray)
-        close(f)
-
-        plotdata = (data[:,1],data[:,2])
-
-        plot!(plotdata, scale=:log10, size=(500,500))
-        return nothing
-    end
+    include("IO.jl")
 end
