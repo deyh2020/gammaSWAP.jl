@@ -1,6 +1,3 @@
-
-import Base: +, *
-
 mutable struct Spinor
     spins::Array{Array{Int}}
     coefficients::Array{Complex}
@@ -22,16 +19,27 @@ function +(spinorA::Spinor, spinorB::Spinor)
 end
 function *(spinorA::Spinor, spinorB::Spinor)
     result = 0
-    conj!(spinorA.coefficients)
     for (coeffA,spinA) in zip(spinorA.coefficients,spinorA.spins)
         for (coeffB,spinB) in zip(spinorB.coefficients,spinorB.spins)
             if spinA == spinB
-                result += coeffA*coeffB
+                result += conj(coeffA)*coeffB
             end
         end
     end
-    result
+    return result
 end
+function normalize(spinor::Spinor)
+    newSpinor = deepcopy(spinor)
+    newSpinor.coefficients = spinor.coefficients ./sqrt(spinor*spinor) #spinor on left is already daggered. See *(::Spinor,::Spinor)
+    return newSpinor
+end
+function isequal(spinorA::Spinor, spinorB::Spinor)
+    spinorA = normalize(spinorA)
+    spinorB = normalize(spinorB)
+    return spinorA*spinorB ≈ 1.0
+end
+==(spinorA::Spinor, spinorB::Spinor) = isequal(spinorA, spinorB)
+
 *(α::Any, spinorB::Spinor) = Spinor(spinorB.spins,α.*spinorB.coefficients)
 *(spinorB::Spinor, α::Any) = α*spinorB
 

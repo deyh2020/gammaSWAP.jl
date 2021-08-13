@@ -2,7 +2,7 @@ module SpinQubits
 
     using LinearAlgebra, Statistics, Distributions, Test, Plots
 
-    import Base: +, *
+    import Base: +, *, isequal, ==
     
     export calculateFidelities, saveFidelities, plotter!, readmathematica
 
