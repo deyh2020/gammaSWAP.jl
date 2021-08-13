@@ -7,13 +7,26 @@ using SpinQubits, Test
 	@test calculateFidelities(4, 0.05, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0396766971366405 rtol=1e-8
 end
 
-# Testing spinors
-
-# Testing operators
-
-# Testing utils
-
-# Testing tensors
+@testset "Tensors" begin
+	@testset "J tensors" begin
+		@test all(sum(SpinQubits.getjtensor(2, 0.0),dims=3) .≈ [1.0  0.0  0.0 0.0;
+		                                  0.0 -1.0  2.0 0.0;
+										  0.0  2.0 -1.0 0.0;
+										  0.0  0.0  0.0 1.0])
+		@test all(sum(SpinQubits.getjtensor(2, 0.1),dims=3) .≈ [1.0  0.0  0.0 0.0;
+										  0.0 -1.0  2.0 0.0;
+										  0.0  2.0 -1.0 0.0;
+										  0.0  0.0  0.0 1.0])
+		@test all(sum(SpinQubits.getjtensor(3, 0.01),dims=3) .≈ [2.01 0.0	0.0	0.0	0.0	0.0	0.0	0.0;
+										  0.0 -0.01 2.0	0.0	0.02 0.0 0.0 0.0;
+										  0.0 2 -1.99 0.0 2.0	0.0	0.0	0.0;
+										  0.0 0.0 0.0 -0.01	0.0 2 0.02	0.0;
+										  0.0 0.02	2.0 0.0 -0.01 0.0 0.0 0.0;
+										  0.0 0.0 0.0 2.0 0.0 -1.99 2.0 0.0;
+										  0.0 0.0 0.0 0.02 0.0 2.0 -0.01	0.0;
+										  0.0 0.0 0.0 0.0 0.0 0.0 0.0 2.01])			  							  
+	end
+end
 
 # Testing integration
 #=@testset "Noiseless fidelities" begin

@@ -96,14 +96,15 @@ module SpinQubits
                         if swapIndex <= L-k
                             js[baseIndex + swapIndex] *= jSWAP/j0
                         end
-                        if swapIndex > k && k > 1
-                            js[baseIndex + (swapIndex - k)] *= jSWAP/j0
+                        if swapIndex > (k-1) && k > 1
+                            js[baseIndex + (swapIndex - (k-1))] *= jSWAP/j0
                         end
                         baseIndex += L-k
                     end
                     Ham!(ham,L,jtensor,γm,js,γ0)
                     
 
+                    println(abs.(round.(ham; digits=6)))
                     eigenObject = eigen!(ham) 
                     D .= Diagonal(eigenObject.values)
                     
@@ -115,9 +116,7 @@ module SpinQubits
                     
                     mul!(trueU,U,udiss) # ham here is just used as dummy memory space, not the hamiltonian
                     mul!(finalKet,trueU,currentKet)
-                    
                 end # sequence
-                println(abs.(finalKet))
                 singleExpFidelities[i] = abs2(initKet'*finalKet)           
             end # average
             fidelities[expIndex] = mean(singleExpFidelities)
@@ -125,6 +124,6 @@ module SpinQubits
         return 10 .^exponents,1 .-fidelities
     end
 
-
-    include("IO.jl")
+    calculateFidelities(3, 0.01, 0.0, 0.0, zeros(3), 10, 0.01)
+    #include("IO.jl")
 end
