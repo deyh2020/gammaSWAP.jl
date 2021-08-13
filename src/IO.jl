@@ -51,7 +51,7 @@ function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING;format="mathematica")
     sigString = string("σJ",rpad(sigmas[1],4,"0"),"_","σγ",rpad(sigmas[2],4,"0"),"_","στ",rpad(sigmas[3],4,"0"),"_",lpad(nRealsPrime,5,"0"))
 
     filename = joinpath(pwd(),"jdata",string(format,"_",L,"_up_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
-    println(filename)
+    #println(filename)
     if !isfile(filename)
         println("File is missing.")
         return nothing
