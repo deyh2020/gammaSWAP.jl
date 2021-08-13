@@ -16,3 +16,10 @@ function diagexp!(array, result)
     end
     nothing
 end
+
+function zeros!(A)
+    for i in eachindex(A)
+        A[i] = 0.0
+    end
+    nothing
+end

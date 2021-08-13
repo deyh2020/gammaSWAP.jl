@@ -82,15 +82,11 @@ module SpinQubits
                 end
 
                 for swapIndex in sequence
-                    for m in 1:2^L
-                        for n in 1:2^L
-                        U[m,n] = 0.0
-                        ham[m,n] = 0.0 
-                        end
-                    end
+                    zeros!(U)
+                    zeros!(ham)
                     currentKet .= finalKet
-
                     js[:] .= @view j0s[:,i]
+
                     baseIndex = 0
                     for k in 1:L-1 # k is the interspin distance
                         if swapIndex <= L-k
@@ -101,6 +97,7 @@ module SpinQubits
                         end
                         baseIndex += L-k
                     end
+
                     Ham!(ham,L,jtensor,γm,js,γ0)
                     
 
