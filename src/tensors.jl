@@ -1,6 +1,5 @@
 function getγtensor(L)
     h = zeros(2^L,2^L)
-    gamma = GAMMA
     basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
     for (i,spinorI) in enumerate(basis)
         for (j,spinorJ) in enumerate(basis)
@@ -12,7 +11,6 @@ end
 
 function getjtensor(L,β)
     jTensor = zeros(2^L, 2^L, Int(L*(L-1)/2))
-    gamma = GAMMA
     basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
     for (i,spinorI) in enumerate(basis)
         for (j,spinorJ) in enumerate(basis)

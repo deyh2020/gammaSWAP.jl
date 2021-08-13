@@ -17,19 +17,24 @@ module SpinQubits
         σJ = sigmas[1]
         σγ = sigmas[2]
         στ = sigmas[3] #deviation in nanoseconds
+        nIterations = (maximum(sigmas) == 0) ? 1 : nReals
         j0 = 1.0
         
         jtensor = getjtensor(L,β)
         γm = getγtensor(L)
+
         D = zeros(2^L,2^L)
         R = zeros(2^L,2^L) 
+        ham::Matrix{ComplexF64} = zeros(2^L,2^L)
+        diss::Matrix{ComplexF64} = Diagonal(zeros(2^L))
+        udiss::Matrix{ComplexF64} = Diagonal(zeros(2^L))
+        UD::Matrix{ComplexF64} = zeros(2^L,2^L)
+        U::Matrix{ComplexF64} = zeros(2^L,2^L)
+        trueU::Matrix{ComplexF64} = zeros(2^L,2^L)
 
         exponents = collect(range(0.0,3.0,step=spacing))
-        nIterations = (maximum(sigmas) == 0) ? 1 : nReals
         singleExpFidelities = zeros(nIterations)
         fidelities = zeros(length(exponents))
-        basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
-        kets::Array{Array{Int,1},1} = map(x->x.spins[1],basis)
         sequence = [collect(1:L-1);collect((L-1):-1:1)]
         
         δt = στ*1e-9
@@ -38,15 +43,13 @@ module SpinQubits
         tShortestMine = pi/*(4.0 * j0 * 10.0^exponents[end])
         scaledστ = δrel*tShortestMine
 
-        initialSpinKet = [[0]; ones(Int64,L-1)]
         numJs = Int(L*(L-1)/2) # n + (n-1) + (n-2) + ... = n(n+1)/2
         js = zeros(numJs) 
-        ham::Matrix{ComplexF64} = zeros(2^L,2^L)
-        diss::Matrix{ComplexF64} = Diagonal(zeros(2^L))
-        udiss::Matrix{ComplexF64} = Diagonal(zeros(2^L))
-        UD::Matrix{ComplexF64} = zeros(2^L,2^L)
-        U::Matrix{ComplexF64} = zeros(2^L,2^L)
-        trueU::Matrix{ComplexF64} = zeros(2^L,2^L)
+
+        initialSpinKet = [[0]; ones(Int64,L-1)]
+        basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
+        kets::Array{Array{Int,1},1} = map(x->x.spins[1],basis)
+        
         initKet = zeros(2^L)
         initKet[findfirst(isequal(initialSpinKet),kets)] = 1.0
         finalKet::Vector{ComplexF64} = deepcopy(initKet)
