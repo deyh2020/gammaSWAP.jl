@@ -15,6 +15,7 @@ module SpinQubits
     function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false)
     
         # construct exponents; Scale στ to our units
+        j0 = 1.0
         exponents = collect(range(0.0,3.0,step=spacing))
         δt = sigmas[3]*1e-9
         tShortestPetta = 23e-9
@@ -23,7 +24,6 @@ module SpinQubits
         sigmas[3] = δrel*tShortestMine
 
         nIterations = (maximum(sigmas) == 0) ? 1 : nReals
-        j0 = 1.0
         
         # Initialize collections for building hamiltonian
         jtensor = getjtensor(L,β)
