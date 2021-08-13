@@ -23,7 +23,7 @@ module SpinQubits
         D = zeros(2^L,2^L)
         R = zeros(2^L,2^L) 
 
-        exponents = collect(range(3.0,3.0,step=spacing))
+        exponents = collect(range(0.0,3.0,step=spacing))
         nIterations = (maximum(sigmas) == 0) ? 1 : nReals
         singleExpFidelities = zeros(nIterations)
         fidelities = zeros(length(exponents))
@@ -120,6 +120,5 @@ module SpinQubits
         return 10 .^exponents,1 .-fidelities
     end
 
-    calculateFidelities(3, 0.01, 0.0, 0.0, zeros(3), 10, 0.01)
-    #include("IO.jl")
+    include("IO.jl")
 end
