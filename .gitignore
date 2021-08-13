@@ -23,6 +23,9 @@ docs/site/
 # environment.
 Manifest.toml
 
+# data
+jdata*
+
 # submission scripts
 batch.sh
 test.sh
