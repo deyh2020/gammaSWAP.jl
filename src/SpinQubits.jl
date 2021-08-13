@@ -23,7 +23,7 @@ module SpinQubits
         D = zeros(2^L,2^L)
         R = zeros(2^L,2^L) 
 
-        exponents = collect(range(0.0,3.0,step=spacing))
+        exponents = collect(range(3.0,3.0,step=spacing))
         nIterations = (maximum(sigmas) == 0) ? 1 : nReals
         singleExpFidelities = zeros(nIterations)
         fidelities = zeros(length(exponents))
@@ -117,6 +117,7 @@ module SpinQubits
                     mul!(finalKet,trueU,currentKet)
                     
                 end # sequence
+                println(abs.(finalKet))
                 singleExpFidelities[i] = abs2(initKet'*finalKet)           
             end # average
             fidelities[expIndex] = mean(singleExpFidelities)
