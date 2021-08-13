@@ -1,11 +1,18 @@
 using SpinQubits, Test
 
+@testset "Integration tests" begin
+	@testset "Noiseless fidelities" begin
+		@test calculateFidelities(4, 0.00, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0000148240466523175 rtol=1e-8
+		@test calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0018048111455146731 rtol=1e-8
+		@test calculateFidelities(4, 0.05, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0396766971366405 rtol=1e-8
+	end
+	@testset "Noisy fidelities" begin
+		@test calculateFidelities(4, 0.01, 0.0, 0.0, [0.01, 0.00, 0.00], 500, 3.0)[2][end] ≈ 0.004797717971749105 rtol=1e-1
+		#@test calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0018048111455146731 rtol=1e-8
+		#@test calculateFidelities(4, 0.05, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0396766971366405 rtol=1e-8
+	end
 
-@testset "Noiseless fidelities" begin
-	@test calculateFidelities(4, 0.00, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0000148240466523175 rtol=1e-8
-	@test calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0018048111455146731 rtol=1e-8
-	@test calculateFidelities(4, 0.05, 0.0, 0.0, zeros(3), 10, 1.0)[2][end] ≈ 0.0396766971366405 rtol=1e-8
-end
+
 
 @testset "Tensors" begin
 	@testset "J tensors" begin
@@ -27,9 +34,3 @@ end
 										  0.0 0.0 0.0 0.0 0.0 0.0 0.0 2.01])			  							  
 	end
 end
-
-# Testing integration
-#=@testset "Noiseless fidelities" begin
-	#@test calculateFidelities(4,0.01,0.0,0.0,[0.0, 0.0, 0.0],10, 0.01)[2][end] ≈ 0.0018048111455146731
-	#@test calculateFidelities(4,0.01,0.0,0.0,[0.0, 0.0, 0.0],10, 0.01)[2][end] ≈ 1.4824046652317513e-5
-#end=#
