@@ -40,7 +40,7 @@ using SpinQubits, LinearAlgebra, Test
 		end
 	end
 
-	@testset verbose=true "spinors.jl" begin
+	@testset "spinors.jl" begin
 		spinor1 = SpinQubits.Spinor([[1,0,0,1],[0,0,1,1]],[2.0,1.0])
 		spinor2 = SpinQubits.Spinor([[1,0,0,1],[0,1,0,1]],[im,1.0])
 		@testset "isequal" begin
@@ -70,34 +70,36 @@ using SpinQubits, LinearAlgebra, Test
 			@test SpinQubits.normalize(spinor2) == SpinQubits.Spinor([[1,0,0,1],[0,1,0,1]],[im/sqrt(2),1.0/sqrt(2)])
 			@test SpinQubits.normalize(spinor1 + spinor2) == SpinQubits.Spinor([[1,0,0,1],[0,0,1,1],[0,1,0,1]],[(2.0 + im)/sqrt(7), 1.0/sqrt(7), 1.0/sqrt(7)])
 		end
-		#=@testset "getInitKet" begin
-			@test getInitKet(2, true)
-			@test getInitKet(2, false)
-			@test getInitKet(3, true)
-			@test getInitKet(3, false)
-			@test getInitKet(4, true)
-			@test getInitKet(4, false)
-		end=#
+		@testset "getInitKet" begin # Sanity check, the order of "basis" is ddd ddu dud duu udd udu uud uuu
+			@test SpinQubits.getInitKet(2, true) ≈ [0.0, -1/sqrt(2), 1/sqrt(2), 0.0]
+			@test SpinQubits.getInitKet(2, false) ≈ [0.0, 1.0, 0.0, 0.0]
+			@test SpinQubits.getInitKet(3, true)  ≈ [0.0, 0.0, 0.0, -1/sqrt(2), 0.0, 1/sqrt(2), 0.0, 0.0]
+			@test SpinQubits.getInitKet(3, false) ≈ [0.0, 0.0, 0.0,       1.0,  0.0,       0.0, 0.0, 0.0]
+			@test SpinQubits.getInitKet(4, true) ≈ [0.0, 0.0, 0.0,        0.0, 0.0, 0.0, 0.0, -1/sqrt(2), 
+										  0.0, 0.0, 0.0, 1/sqrt(2), 0.0, 0.0, 0.0,       0.0]
+			@test SpinQubits.getInitKet(4, false) ≈ [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 
+										  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+		end
 	end
 
 	@testset "tensors.jl" begin
 		@testset "J tensors" begin
-			@test all(sum(SpinQubits.getjtensor(2, 0.0),dims=3) .≈ [1.0  0.0  0.0 0.0;
-											0.0 -1.0  2.0 0.0;
-											0.0  2.0 -1.0 0.0;
-											0.0  0.0  0.0 1.0])
-			@test all(sum(SpinQubits.getjtensor(2, 0.1),dims=3) .≈ [1.0  0.0  0.0 0.0;
-											0.0 -1.0  2.0 0.0;
-											0.0  2.0 -1.0 0.0;
-											0.0  0.0  0.0 1.0])
-			@test all(sum(SpinQubits.getjtensor(3, 0.01),dims=3) .≈ [2.01 0.0	0.0	0.0	0.0	0.0	0.0	0.0;
-											0.0 -0.01 2.0	0.0	0.02 0.0 0.0 0.0;
-											0.0 2 -1.99 0.0 2.0	0.0	0.0	0.0;
-											0.0 0.0 0.0 -0.01	0.0 2 0.02	0.0;
-											0.0 0.02	2.0 0.0 -0.01 0.0 0.0 0.0;
-											0.0 0.0 0.0 2.0 0.0 -1.99 2.0 0.0;
-											0.0 0.0 0.0 0.02 0.0 2.0 -0.01	0.0;
-											0.0 0.0 0.0 0.0 0.0 0.0 0.0 2.01])
+			@test sum(SpinQubits.getjtensor(2, 0.0),dims=3) ≈ [1.0  0.0  0.0 0.0;
+																	0.0 -1.0  2.0 0.0;
+																	0.0  2.0 -1.0 0.0;
+																	0.0  0.0  0.0 1.0]
+			@test sum(SpinQubits.getjtensor(2, 0.1),dims=3) ≈ [1.0  0.0  0.0 0.0;
+																0.0 -1.0  2.0 0.0;
+																0.0  2.0 -1.0 0.0;
+																0.0  0.0  0.0 1.0]
+			@test sum(SpinQubits.getjtensor(3, 0.01),dims=3) ≈ [2.01 0.0	0.0	0.0	0.0	0.0	0.0	0.0;
+																0.0 -0.01 2.0	0.0	0.02 0.0 0.0 0.0;
+																0.0 2 -1.99 0.0 2.0	0.0	0.0	0.0;
+																0.0 0.0 0.0 -0.01	0.0 2 0.02	0.0;
+																0.0 0.02	2.0 0.0 -0.01 0.0 0.0 0.0;
+																0.0 0.0 0.0 2.0 0.0 -1.99 2.0 0.0;
+																0.0 0.0 0.0 0.02 0.0 2.0 -0.01	0.0;
+																0.0 0.0 0.0 0.0 0.0 0.0 0.0 2.01]
 		end
 	end
 end
