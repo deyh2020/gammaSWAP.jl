@@ -10,7 +10,7 @@ function Ham!(ham,L,jt,γm,jcouplings,γ)
     end
 end
 
-function incorporateNoise!(j0s, γs, τs, sigmas, jSWAP, j0)
+function incorporateNoise!(j0s, γs, τs, sigmas, disGam, jSWAP, j0)
     if sigmas[2] > 0.0
         γdist = truncated(Normal(disGam,sigmas[2]*j0s[1]),0.0,Inf) # Prob. distribution of γ. σγ ∝ J^1
         for i in eachindex(γs)

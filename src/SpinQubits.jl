@@ -57,7 +57,7 @@ module SpinQubits
             expIndex % 25 == 0 ? println("Calculating ",expIndex,"th exponent out of ",length(exponents)) : nothing
             jSWAP = 10.0^exponent
             
-            incorporateNoise!(j0s, γs, τs, sigmas, jSWAP, j0)
+            incorporateNoise!(j0s, γs, τs, sigmas, disGam, jSWAP, j0)
 
             for i in 1:nIterations
                 currentKet .= initKet
@@ -103,6 +103,4 @@ module SpinQubits
         end # exponents
         return 10 .^exponents,1 .-fidelities
     end
-
-    calculateFidelities(4, 0.01, 0.0, 0.0, [0.01, 0.0, 0.0], 10, 3.0)
 end
