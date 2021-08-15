@@ -57,7 +57,7 @@ module SpinQubits
             expIndex % 25 == 0 ? println("Calculating ",expIndex,"th exponent out of ",length(exponents)) : nothing
             jSWAP = 10.0^exponent
             
-            incorporateNoise!(j0s, γs, τs, sigmas, jSWAP)
+            incorporateNoise!(j0s, γs, τs, sigmas, jSWAP, j0)
 
             for i in 1:nIterations
                 currentKet .= initKet
@@ -73,7 +73,6 @@ module SpinQubits
                     zeros!(ham)
                     currentKet .= finalKet
                     js[:] .= @view j0s[:,i]
-
                     baseIndex = 0
                     for k in 1:L-1 # k is the interspin distance
                         if swapIndex <= L-k
@@ -84,7 +83,6 @@ module SpinQubits
                         end
                         baseIndex += L-k
                     end
-                    #println(js)
                     Ham!(ham,L,jtensor,γm,js,γ0)
 
                     eigenObject = eigen!(ham) 

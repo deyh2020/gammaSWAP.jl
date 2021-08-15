@@ -8,8 +8,8 @@ using SpinQubits, LinearAlgebra, Test
 			@test calculateFidelities(4, 0.05, 0.0, 0.0, zeros(3), 10, 3.0)[2][end] ≈ 0.0396766971366405 rtol=1e-8
 		end
 		@testset "Noisy fidelities" begin
-			@test_skip calculateFidelities(4, 0.01, 0.0, 0.0, [0.01, 0.00, 0.00], 5000, 3.0)[2][end] ≈ 0.004784666103416213 rtol=5e-2
-			@test_skip calculateFidelities(4, 0.02, 0.0, 0.0, [0.01, 0.00, 0.00], 5000, 3.0)[2][end] ≈ 0.00951159418717562 rtol=5e-2
+			@test calculateFidelities(4, 0.01, 0.0, 0.0, [0.01, 0.00, 0.00], 5000, 3.0)[2][end] ≈ 0.004784666103416213 rtol=5e-2
+			@test calculateFidelities(4, 0.02, 0.0, 0.0, [0.01, 0.00, 0.00], 5000, 3.0)[2][end] ≈ 0.00951159418717562 rtol=5e-2
 		end
 	end
 	@testset "utils.jl" begin
