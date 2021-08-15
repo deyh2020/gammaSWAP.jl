@@ -45,7 +45,6 @@ module SpinQubits
         R = zeros(2^L,2^L) 
         ham::Matrix{ComplexF64} = zeros(2^L,2^L)
         diss::Matrix{ComplexF64} = Diagonal(zeros(2^L))
-        udiss::Matrix{ComplexF64} = Diagonal(zeros(2^L))
         UD::Matrix{ComplexF64} = zeros(2^L,2^L)
         U::Matrix{ComplexF64} = zeros(2^L,2^L)
         trueU::Matrix{ComplexF64} = zeros(2^L,2^L)
@@ -85,9 +84,8 @@ module SpinQubits
                         end
                         baseIndex += L-k
                     end
-
+                    #println(js)
                     Ham!(ham,L,jtensor,γm,js,γ0)
-                    
 
                     eigenObject = eigen!(ham) 
                     D .= Diagonal(eigenObject.values)
@@ -98,7 +96,7 @@ module SpinQubits
                     mul!(ham,UD,transpose(R)) # ham here is just used as dummy memory space, not the hamiltonian
                     mul!(U,R,ham) # ham here is just used as dummy memory space, not the hamiltonian
                     
-                    mul!(trueU,U,udiss) # ham here is just used as dummy memory space, not the hamiltonian
+                    mul!(trueU,U,diss) # ham here is just used as dummy memory space, not the hamiltonian
                     mul!(finalKet,trueU,currentKet)
                 end # sequence
                 singleExpFidelities[i] = abs2(initKet'*finalKet)           
@@ -107,4 +105,6 @@ module SpinQubits
         end # exponents
         return 10 .^exponents,1 .-fidelities
     end
+
+    calculateFidelities(4, 0.01, 0.0, 0.0, [0.01, 0.0, 0.0], 10, 3.0)
 end

@@ -17,15 +17,11 @@ function incorporateNoise!(j0s, γs, τs, sigmas, jSWAP)
             γs[i] = rand(γdist)
         end
     end
-    if sigmas[1] > 0.0
-        for i in eachindex(j0s)
-            j0s[i] = j0s[i] * (1.0 + randn()*sigmas[1]) # This isn't truncated because σJ is so small ~0.01
-        end
+    for i in eachindex(j0s)
+        j0s[i] = j0s[i] * (1.0 + randn()*sigmas[1]) # This isn't truncated because σJ is so small ~0.01
     end
-    if sigmas[3] > 0.0
-        for i in eachindex(τs)
-            τs[i] = pi/(4.0 * jSWAP) + randn().*sigmas[3]
-        end
+    for i in eachindex(τs)
+        τs[i] = pi/(4.0 * jSWAP) + randn().*sigmas[3]
     end
 end
 
