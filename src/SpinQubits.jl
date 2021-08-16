@@ -103,8 +103,4 @@ module SpinQubits
         end # exponents
         return 10 .^exponents,1 .-fidelities
     end
-    function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64)
-        return calculateFidelities(L, β, γ0, disGam, sigmas, nReals, spacing; )
-    end
-
 end
