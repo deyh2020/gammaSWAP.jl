@@ -20,7 +20,7 @@ function getjtensor(L,β; betaArray=[])
             baseIndex = 0
             for k in 1:L-1
                 for n in 1:L-k
-                    jTensor[i, j, baseIndex + n] = betas[k]*spinorI*σiσj(n,n+k,spinorJ)         
+                    jTensor[i, j, baseIndex + n] = betas[k]*(spinorI*σiσj(n,n+k,spinorJ))        
                 end
                 baseIndex += L-k
             end
