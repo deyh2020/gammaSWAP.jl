@@ -12,7 +12,7 @@ module SpinQubits
     include("tensors.jl")
     include("IO.jl")
 
-    function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false)
+    function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false, betas=[], verbose=true)
     
         # construct exponents; Scale στ to our units
         j0 = 1.0
@@ -26,7 +26,7 @@ module SpinQubits
         nIterations = (maximum(sigmas) == 0) ? 1 : nReals
         
         # Initialize collections for building hamiltonian
-        jtensor = getjtensor(L,β)
+        jtensor = getjtensor(L, β; betaArray=betas)
         γm = getγtensor(L)
         numJs = Int(L*(L-1)/2) # n + (n-1) + (n-2) + ... = n(n+1)/2
         js = zeros(numJs) 
@@ -54,7 +54,7 @@ module SpinQubits
         for expIndex in 1:length(exponents)
             
             exponent = exponents[expIndex]
-            expIndex % 25 == 0 ? println("Calculating ",expIndex,"th exponent out of ",length(exponents)) : nothing
+            (verbose && expIndex % 25 == 0) ? println("Calculating ",expIndex,"th exponent out of ",length(exponents)) : nothing
             jSWAP = 10.0^exponent
             
             incorporateNoise!(j0s, γs, τs, sigmas, disGam, jSWAP, j0)
@@ -103,4 +103,8 @@ module SpinQubits
         end # exponents
         return 10 .^exponents,1 .-fidelities
     end
+    function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64)
+        return calculateFidelities(L, β, γ0, disGam, sigmas, nReals, spacing; )
+    end
+
 end

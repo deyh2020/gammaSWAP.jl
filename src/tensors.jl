@@ -9,7 +9,10 @@ function getγtensor(L)
     return h
 end
 
-function getjtensor(L,β)
+function getjtensor(L,β; betaArray=[])
+    betas = betaArray == [] ? [β^i for i in 0:L-2] : betaArray
+    length(betas) != L-1 ? error("betas is wrong length.") : nothing
+
     jTensor = zeros(2^L, 2^L, Int(L*(L-1)/2))
     basis = [Spinor([(reverse(digits(i, base=2, pad=L)))],[1]) for i in 0:2^L-1]
     for (i,spinorI) in enumerate(basis)
@@ -17,7 +20,7 @@ function getjtensor(L,β)
             baseIndex = 0
             for k in 1:L-1
                 for n in 1:L-k
-                    jTensor[i, j, baseIndex + n] = β^(k-1)*spinorI*σiσj(n,n+k,spinorJ)         
+                    jTensor[i, j, baseIndex + n] = betas[k]*spinorI*σiσj(n,n+k,spinorJ)         
                 end
                 baseIndex += L-k
             end
