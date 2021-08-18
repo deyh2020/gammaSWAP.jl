@@ -21,7 +21,7 @@ end
 
 function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=false,format="mathematica", data=nothing)
 
-    filename = getFilename(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=false,format="mathematica")
+    filename = getFilename(L,BETA,DISGAM,sigmas,nREALS,SPACING; index=index, singlet=singlet,format="mathematica")
 	mkpath(joinpath(pwd(),string("jdata",index)))
 
     if isfile(filename) && parse(Int,split(strip(read(`wc -c $filename`, String))," ")[1]) > 0
@@ -29,11 +29,11 @@ function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=fa
     else
         if isnothing(data)
             println("No file found. Calculating...")
-            f = open(filename,"w")
-            theseExponents = collect(range(0.0,3.0,step=SPACING))
             data = calculateFidelities(L,BETA,0.0,DISGAM,sigmas,nREALS,SPACING;singlet)
             println("Done.")
         end
+        theseExponents = data[1]
+        f = open(filename,"w")
         if format=="mathematica"
             # Mathematica plotting format
             print(f, "{")
@@ -52,14 +52,15 @@ end
 
 function averager(L,BETA,DISGAM,sigmas,nREALS,SPACING; singlet=false)
     #Currently only supports mathematica formats
-    numExps = Int(3/spacing + 1)
+    numExps = Int(3/SPACING + 1)
     avg = zeros(numExps)
+    jSWAPs = zeros(numExps)
 
     n = 0
     for i in 1:100 
-        filename= getFilename(L, BETA, DISGAM, sigmas, nREALS, SPACING; singlet=singlet, format="mathematica")
+        filename= getFilename(L, BETA, DISGAM, sigmas, nREALS, SPACING; index=i, singlet=singlet, format="mathematica")
         if isfile(filename)
-            i == 1 ? jSWAPs = readmathematica(filename)[1] : nothing
+            jSWAPs = readmathematica(filename)[1]
             avg += readmathematica(filename)[2]
             n += 1
         else
@@ -68,7 +69,7 @@ function averager(L,BETA,DISGAM,sigmas,nREALS,SPACING; singlet=false)
     end
 
     thisData = jSWAPs, avg ./ n
-    saveFidelities(L, BETA, DISGAM, sigmas, nREALS*n, SPACING; index="AVG", singlet=singlet, format="mathematica", data=thisData)
+    saveFidelities(L, BETA, DISGAM, sigmas, nREALS*n , SPACING; index="AVG", singlet=singlet, format="mathematica", data=thisData)
     return 
 
 
@@ -79,7 +80,7 @@ function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING;singlet=false,format="math
     n = length(range(0.0,3.0,step=SPACING))
     emptyarray = zeros(Float64,n,2)
 
-    filename = getFilename(L,BETA,DISGAM,sigmas,nREALS,SPACING; singlet,format)
+    filename = getFilename(L,BETA,DISGAM,sigmas,nREALS,SPACING; singlet=singlet, format=format)
 
     if !isfile(filename)
         println("File is missing.")
