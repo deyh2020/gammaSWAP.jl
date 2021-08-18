@@ -9,7 +9,7 @@ function readmathematica(filename)
     return dataMat[:,1], dataMat[:,2]
 end
 
-function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING;index="",singlet=false,format="mathematica")
+function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=false,format="mathematica")
 
     gamString = rpad(DISGAM,4,"0")
     nRealsPrime = maximum(sigmas) == 0 ? 0 : nREALS
@@ -18,7 +18,7 @@ function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING;index="",singlet=fal
 
     filename = joinpath(pwd(),string("jdata",index),string(format,"_",L,"_",initString,"_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
 
-    mkpath(joinpath(pwd(),string("jdata",index))
+	mkpath(joinpath(pwd(),string("jdata",index)))
 
     if isfile(filename) && parse(Int,split(strip(read(`wc -c $filename`, String))," ")[1]) > 0
         println("File already found. Skipping.")
