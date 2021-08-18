@@ -25,9 +25,3 @@ Manifest.toml
 
 # data
 jdata*
-
-# submission scripts
-batch.sh
-test.sh
-runner.jl
-*.out
