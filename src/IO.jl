@@ -9,25 +9,31 @@ function readmathematica(filename)
     return dataMat[:,1], dataMat[:,2]
 end
 
-function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=false,format="mathematica")
+function getFilename(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=false,format="mathematica")
 
     gamString = rpad(DISGAM,4,"0")
     nRealsPrime = maximum(sigmas) == 0 ? 0 : nREALS
     initString = singlet ? "s" : "up"
     sigString = string("σJ",rpad(sigmas[1],4,"0"),"_","σγ",rpad(sigmas[2],4,"0"),"_","στ",rpad(sigmas[3],4,"0"),"_",lpad(nRealsPrime,5,"0"))
 
-    filename = joinpath(pwd(),string("jdata",index),string(format,"_",L,"_",initString,"_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
+    return joinpath(pwd(),string("jdata",index),string(format,"_",L,"_",initString,"_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
+end
 
+function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=false,format="mathematica", data=nothing)
+
+    filename = getFilename(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=false,format="mathematica")
 	mkpath(joinpath(pwd(),string("jdata",index)))
 
     if isfile(filename) && parse(Int,split(strip(read(`wc -c $filename`, String))," ")[1]) > 0
         println("File already found. Skipping.")
     else
-        println("No file found. Calculating...")
-        f = open(filename,"w")
-        theseExponents = collect(range(0.0,3.0,step=SPACING))
-        data = calculateFidelities(L,BETA,0.0,DISGAM,sigmas,nREALS,SPACING;singlet)
-        println("Done.")
+        if isnothing(data)
+            println("No file found. Calculating...")
+            f = open(filename,"w")
+            theseExponents = collect(range(0.0,3.0,step=SPACING))
+            data = calculateFidelities(L,BETA,0.0,DISGAM,sigmas,nREALS,SPACING;singlet)
+            println("Done.")
+        end
         if format=="mathematica"
             # Mathematica plotting format
             print(f, "{")
@@ -44,17 +50,37 @@ function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=fa
     nothing
 end
 
-function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING;format="mathematica")
+function averager(L,BETA,DISGAM,sigmas,nREALS,SPACING; singlet=false)
+    #Currently only supports mathematica formats
+    numExps = Int(3/spacing + 1)
+    avg = zeros(numExps)
+
+    n = 0
+    for i in 1:100 
+        filename= getFilename(L, BETA, DISGAM, sigmas, nREALS, SPACING; singlet=singlet, format="mathematica")
+        if isfile(filename)
+            i == 1 && jSWAPs = readmathematica(filename)[1]
+            avg += readmathematica(filename)[2]
+            n += 1
+        else
+            continue
+        end
+    end
+
+    thisData = jSWAPs, avg ./ n
+    saveFidelities(L, BETA, DISGAM, sigmas, nREALS*n, SPACING; index="AVG", singlet=singlet, format="mathematica", data=thisData)
+    return 
+
+
+end
+
+function plotter!(L,BETA,DISGAM,sigmas,nREALS,SPACING;singlet=false,format="mathematica")
 
     n = length(range(0.0,3.0,step=SPACING))
     emptyarray = zeros(Float64,n,2)
 
-    gamString = rpad(DISGAM,4,"0")
-    nRealsPrime = maximum(sigmas) == 0 ? 0 : nREALS
-    initString = singlet ? "s" : "up"
-    sigString = string("σJ",rpad(sigmas[1],4,"0"),"_","σγ",rpad(sigmas[2],4,"0"),"_","στ",rpad(sigmas[3],4,"0"),"_",lpad(nRealsPrime,5,"0"))
+    filename = getFilename(L,BETA,DISGAM,sigmas,nREALS,SPACING; singlet,format)
 
-    filename = joinpath(pwd(),"jdata",string(format,"_",L,"_",initString,"_β",rpad(BETA,4,"0"),"_γ",gamString,"_",sigString,"_",SPACING))
     if !isfile(filename)
         println("File is missing.")
         return nothing
