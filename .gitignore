@@ -25,3 +25,6 @@ Manifest.toml
 
 # data
 jdata*
+
+# DT2 specific files
+batch.sh

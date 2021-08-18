@@ -8,31 +8,33 @@ function parse_commandline()
     @add_arg_table! s begin
         "--length", "-L"
             arg_type = Int
-	    default = 4
+	        default = 4
         "--singlet", "-s"
             arg_type = Bool
             default = false
         "--sigmas", "-σ"
-            arg_type = Vector
-	    default = zeros(3)
+		    arg_type = String 
+	        default = "0.0,0.0,0.0"
         "--dirspec"
-	    arg_type = String
-	    default = ""
-	"--nReals"
-	    arg_type = Int
-	    default = 10000
-	"--spacing"
-	    arg_type = Float64
-	    default = 0.03
+	        arg_type = String
+	        default = ""
+	    "--nReals"
+	        arg_type = Int
+	        default = 10000
     end
 
     return parse_args(s)
 end
 
 args = parse_commandline()
+sigmas = args["sigmas"]
+sigmas = replace(sigmas, "[" => "")
+sigmas = replace(sigmas, "]" => "")
+sigArray = parse.(Float64,split(sigmas,","))
+spacing = maximum(sigArray) == 0.0 ? 0.01 : 0.03
 
-calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 0.01) # Compilation run
+calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 0.01; verbose=false) # Compilation run
 
 #saveFidelities( 4, 0.01, 0.1, zeros(3), 10, 0.01; singlet=false)
 
-saveFidelities(args["length"], 0.01, 0.1, args["sigmas"], args["nReals"], args["spacing"];index=args["dirspec"], singlet=args["singlet"])
+saveFidelities(args["length"], 0.01, 0.1, sigArray, args["nReals"], spacing ;index=args["dirspec"], singlet=args["singlet"])
