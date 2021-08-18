@@ -59,7 +59,7 @@ function averager(L,BETA,DISGAM,sigmas,nREALS,SPACING; singlet=false)
     for i in 1:100 
         filename= getFilename(L, BETA, DISGAM, sigmas, nREALS, SPACING; singlet=singlet, format="mathematica")
         if isfile(filename)
-            i == 1 && jSWAPs = readmathematica(filename)[1]
+            i == 1 ? jSWAPs = readmathematica(filename)[1] : nothing
             avg += readmathematica(filename)[2]
             n += 1
         else
