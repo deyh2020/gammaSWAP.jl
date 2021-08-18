@@ -4,7 +4,7 @@ module SpinQubits
 
     import Base: +, *, isequal, ==
     
-    export calculateFidelities, saveFidelities, plotter!, readmathematica
+    export calculateFidelities, saveFidelities, averager, plotter!, readmathematica
 
     include("spinors.jl")
     include("operators.jl")
