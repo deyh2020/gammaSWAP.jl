@@ -33,7 +33,4 @@ for i in "${sigJs[@]}";
 	 fi 
     done; 
   done;
-done;
-done;
-done;
 done

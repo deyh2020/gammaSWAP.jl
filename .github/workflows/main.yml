@@ -30,5 +30,9 @@ jobs:
         uses: julia-actions/julia-buildpkg@v1.2.0
         
       - name: Run Julia package tests
-        uses: julia-actions/julia-runtest@v1.6.1
+        run: julia -e 'using Pkg; Pkg.test("SpinQubits", coverage=true)'
+        
+      - name: Submit coverage results to Codecov
+        run: julia -e 'using Pkg; cd(Pkg.dir("SpinQubits")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+
 
