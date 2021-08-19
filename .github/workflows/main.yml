@@ -29,6 +29,11 @@ jobs:
       - name: Run Pkg.build
         uses: julia-actions/julia-buildpkg@v1.2.0
         
+        # Run tests
       - name: Run Julia package tests
-        uses: julia-actions/julia-runtest@v1.6.1
+        run: julia --project -e 'using Pkg; Pkg.test(coverage=true)'
+        
+      - name: Submit coverage results to Codecov
+        run: julia --project -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+
 

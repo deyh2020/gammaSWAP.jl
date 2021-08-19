@@ -10,9 +10,24 @@ function Ham!(ham,L,jt,γm,jcouplings,γ)
     end
 end
 
-function diagexp!(array, result)
-    for i in 1:length(@view result[:,1])
-        result[i,i] = exp(array[i,i])
+function incorporateNoise!(j0s, γs, τs, sigmas, disGam, jSWAP, j0)
+    if sigmas[2] > 0.0
+        γdist = truncated(Normal(disGam,sigmas[2]*j0s[1]),0.0,Inf) # Prob. distribution of γ. σγ ∝ J^1
+        for i in eachindex(γs)
+            γs[i] = rand(γdist)
+        end
+    end
+    for i in eachindex(j0s)
+        j0s[i] = j0 * (1.0 + randn()*sigmas[1]) # This isn't truncated because σJ is so small ~0.01
+    end
+    for i in eachindex(τs)
+        τs[i] = pi/(4.0 * jSWAP) + randn().*sigmas[3]
+    end
+end
+
+function diagexp!(matrix)
+    for i in 1:length(@view matrix[:,1])
+        matrix[i,i] = exp(matrix[i,i])
     end
     nothing
 end
