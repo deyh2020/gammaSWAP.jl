@@ -5,10 +5,10 @@ mod="julia"; for i in `module list`; do [[ $i == *$mod* ]] && notloaded=false; d
 [[ notloaded ]] && module load julia; 
 
 sigJs=( 01 02 03 ); 
-sigYs=( 05 10 20); 
+sigYs=( 05 10 20 ); 
 sigTs=( 05 10 20 );
-lengs=( 4 );
-sings=( true );
+lengs=( 6 );
+sings=( true false );
 for sing in "${sings[@]}";
 do
 if [ $sing == true ]
@@ -29,7 +29,7 @@ for i in "${sigJs[@]}";
 	 #echo $filename
 	 if [ ! -s $filename ]
 	 then
-	   sbatch --time=2:00:00 --mem=2G --ntasks=1 --nodes=1 --mail-user=nfoulk@umd.edu --mail-type=FAIL -J ""$leng""$singstr""$i""_""$j""_""$k"".""$ind"" runner.jl --singlet=$sing --length=$leng --sigmas=0.$i,0.$j,0.$k --nReals=1000 --dirspec=$ind
+	   sbatch --time=2:00:00 --mem=2G --ntasks=1 --nodes=1 --mail-user=nfoulk@umd.edu --mail-type=END -J ""$leng""$singstr""$i""_""$j""_""$k"".""$ind"" runner.jl --singlet=$sing --length=$leng --sigmas=0.$i,0.$j,0.$k --nReals=1000 --dirspec=$ind
 	 fi 
     done; 
   done;
