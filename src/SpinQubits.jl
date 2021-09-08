@@ -18,8 +18,8 @@ module SpinQubits
         j0 = 1.0
         exponents = collect(range(0.0,3.0,step=spacing))
         δt = sigmas[3]*1e-9
-        tShortestPetta = 23e-9
-        δrel = δt/tShortestPetta
+        tShortestNichol = 10e-9
+        δrel = δt/tShortestNichol
         tShortestMine = pi/*(4.0 * j0 * 10.0^exponents[end])
         sigmas[3] = δrel*tShortestMine
 

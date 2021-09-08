@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 
 notloaded=true
-mod="julia"; for i in `module list`; do [[ $i == *$mod* ]] && notloaded=false; done
+mod="julia"; 
+for i in `module list`; 
+  do [[ $i == *$mod* ]] && notloaded=false; 
+done
 [[ notloaded ]] && module load julia; 
 
 sigJs=( 01 02 03 ); 
-sigYs=( 05 10 20 ); 
+disGams=( 01 05 10 ); 
 sigTs=( 05 10 20 );
-lengs=( 6 );
-sings=( true false );
+lengs=( 4 6 );
+sings=( false true );
 for sing in "${sings[@]}";
 do
 if [ $sing == true ]
@@ -22,10 +25,10 @@ do
 for leng in "${lengs[@]}";
 do
 for i in "${sigJs[@]}"; 
-  do for j in "${sigYs[@]}"; 
+  do for j in "${disGams[@]}"; 
     do for k in "${sigTs[@]}"; 
       do 
-	 filename=jdata$ind/mathematica_${leng}_${singstr}_β0.01_γ0.10_σJ0.${i}_σγ0.${j}_στ0.${k}_01000_0.03;
+	 filename=jdata$ind/mathematica_${leng}_${singstr}_β0.01_γ0.${j}_σJ0.${i}_σγ0.00_στ0.${k}_01000_0.03;
 	 #echo $filename
 	 if [ ! -s $filename ]
 	 then
@@ -33,4 +36,8 @@ for i in "${sigJs[@]}";
 	 fi 
     done; 
   done;
+done;
+done;
+done;
 done
+
