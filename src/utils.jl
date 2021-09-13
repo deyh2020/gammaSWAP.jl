@@ -12,7 +12,8 @@ end
 
 function incorporateNoise!(j0s, γs, τs, sigmas, disGam, jSWAP, j0)
     if sigmas[2] > 0.0
-        γdist = truncated(Normal(disGam,sigmas[2]*j0s[1]),0.0,Inf) # Prob. distribution of γ. σγ ∝ J^1
+        γdist = truncated(Normal(disGam,sigmas[2]*j0s[1]/10.0),0.0,Inf) # Prob. distribution of γ. σγ ∝ J^1. 
+	# I divided by 10 for sig gamma plot. The divided by 10 part should be removed. 
         for i in eachindex(γs)
             γs[i] = rand(γdist)
         end
