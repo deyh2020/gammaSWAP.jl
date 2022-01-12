@@ -8,10 +8,10 @@ done
 [[ notloaded ]] && module load julia; 
 
 sigJs=( 01 ); 
-sigYs=( 01 05 10 ); 
+sigYs=( 05 ); 
 sigTs=( 20 );
-lengs=( 4 );
-sings=( false );
+lengs=( 6 );
+sings=( true );
 for sing in "${sings[@]}";
 do
 if [ $sing == true ]
@@ -20,7 +20,7 @@ then
 else
   singstr='up'
 fi
-for ind in {2..10};
+for ind in {1..10};
 do
 for leng in "${lengs[@]}";
 do
@@ -32,7 +32,7 @@ for i in "${sigJs[@]}";
 	 #echo $filename
 	 if [ ! -s $filename ]
 	 then
-	   sbatch --time=2:00:00 --mem=2G --ntasks=1 --nodes=1 --mail-user=nfoulk@umd.edu --mail-type=FAIL -J ""$leng""$singstr""$i""_""$j""_""$k"".""$ind"" runner.jl --singlet=$sing --length=$leng --sigmas=0.$i,0.$j,0.$k --nReals=1000 --dirspec=$ind	
+	   sbatch --time=2:00:00 --mem=2G --ntasks=1 --mail-user=nfoulk@umd.edu --mail-type=FAIL -J ""$leng""$singstr""$i""_""$j""_""$k"".""$ind"" runner.jl --singlet=$sing --length=$leng --sigmas=0.$i,0.$j,0.$k --nReals=1000 --dirspec=$ind	
 	 fi 
     done; 
   done;
