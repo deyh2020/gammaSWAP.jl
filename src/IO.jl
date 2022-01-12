@@ -29,7 +29,7 @@ function saveFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING; index="",singlet=fa
     else
         if isnothing(data)
             println("No file found. Calculating...")
-            data = calculateFidelities(L,BETA,0.0,DISGAM,sigmas,nREALS,SPACING;singlet)
+            data = calculateFidelities(L,BETA,DISGAM,sigmas,nREALS,SPACING;singlet)
             println("Done.")
         end
         theseExponents = data[1]

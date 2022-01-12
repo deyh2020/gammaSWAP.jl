@@ -12,7 +12,7 @@ module SpinQubits
     include("tensors.jl")
     include("IO.jl")
 
-    function calculateFidelities(L::Int64, β::Float64, γ0::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false, betas=[], verbose=true)
+    function calculateFidelities(L::Int64, β::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false, betas=[], verbose=true)
     
         # construct exponents; Scale στ to our units
         j0 = 1.0
@@ -27,7 +27,6 @@ module SpinQubits
         
         # Initialize collections for building hamiltonian
         jtensor = getjtensor(L, β; betaArray=betas)
-        γm = getγtensor(L)
         numJs = Int(L*(L-1)/2) # n + (n-1) + (n-2) + ... = n(n+1)/2
         js = zeros(numJs) 
         
@@ -83,7 +82,7 @@ module SpinQubits
                         end
                         baseIndex += L-k
                     end
-                    Ham!(ham,L,jtensor,γm,js,γ0)
+                    Ham!(ham,L,jtensor,js)
 
                     eigenObject = eigen!(ham) 
                     D .= Diagonal(eigenObject.values)
