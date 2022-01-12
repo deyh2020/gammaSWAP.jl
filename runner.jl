@@ -31,10 +31,12 @@ sigmas = args["sigmas"]
 sigmas = replace(sigmas, "[" => "")
 sigmas = replace(sigmas, "]" => "")
 sigArray = parse.(Float64,split(sigmas,","))
+disGam = 0.10
 spacing = maximum(sigArray) == 0.0 ? 0.01 : 0.03
+#realSigArray = [sigArray[1], 0.0, sigArray[3]]
 
 calculateFidelities(4, 0.01, 0.0, 0.0, zeros(3), 10, 0.01; verbose=false) # Compilation run
 
 #saveFidelities( 4, 0.01, 0.1, zeros(3), 10, 0.01; singlet=false)
 
-saveFidelities(args["length"], 0.01, 0.1, sigArray, args["nReals"], spacing ;index=args["dirspec"], singlet=args["singlet"])
+saveFidelities(args["length"], 0.01, disGam, sigArray, args["nReals"], spacing ;index=args["dirspec"], singlet=args["singlet"])
