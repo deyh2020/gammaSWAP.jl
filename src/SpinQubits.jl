@@ -1,10 +1,14 @@
 module SpinQubits
 
-    using LinearAlgebra, Statistics, Distributions, Test, Plots
+    using LinearAlgebra, Statistics, Distributions, Test, Plots, TimerOutputs
 
     import Base: +, *, isequal, ==
     
     export calculateFidelities, saveFidelities, averager, plotter!, readmathematica
+
+    export to
+    const to = TimerOutput()
+
 
     include("spinors.jl")
     include("operators.jl")
@@ -12,7 +16,7 @@ module SpinQubits
     include("tensors.jl")
     include("IO.jl")
 
-    function calculateFidelities(L::Int64, β::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false, betas=[], verbose=true)
+    @timeit to function calculateFidelities(L::Int64, β::Float64, disGam, sigmas, nReals::Int64, spacing::Float64; singlet=false, betas=[], verbose=true)
     
         # construct exponents; Scale στ to our units
         j0 = 1.0
@@ -89,12 +93,14 @@ module SpinQubits
                     
                     R .= eigenObject.vectors
                     UD .= (-im .* D .* τs[i])
-                    diagexp!(UD) 
-                    mul!(ham,UD,transpose(R)) # ham here is just used as dummy memory space, not the hamiltonian
-                    mul!(U,R,ham) # ham here is just used as dummy memory space, not the hamiltonian
-                    
-                    mul!(trueU,U,diss) # ham here is just used as dummy memory space, not the hamiltonian
-                    mul!(finalKet,trueU,currentKet)
+                    @timeit to "matmuls" begin
+                        diagexp!(UD) 
+                        mul!(ham,UD,transpose(R)) # ham here is just used as dummy memory space, not the hamiltonian
+                        mul!(U,R,ham) # ham here is just used as dummy memory space, not the hamiltonian
+                        
+                        mul!(trueU,U,diss) # ham here is just used as dummy memory space, not the hamiltonian
+                        mul!(finalKet,trueU,currentKet)
+                    end
                 end # sequence
                 singleExpFidelities[i] = abs2(initKet'*finalKet)           
             end # average
