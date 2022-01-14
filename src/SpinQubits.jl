@@ -4,9 +4,8 @@ module SpinQubits
 
     import Base: +, *, isequal, ==
     
-    export calculateFidelities, saveFidelities, averager, plotter!, readmathematica
+    export calculateFidelities, saveFidelities, averager, plotter!, readmathematica, to
 
-    export to
     const to = TimerOutput()
 
 
@@ -72,27 +71,29 @@ module SpinQubits
                 diagexp!(diss)
 
                 for swapIndex in sequence
-                    zeros!(U)
-                    zeros!(ham)
-                    currentKet .= finalKet
-                    js[:] .= @view j0s[:,i]
-                    baseIndex = 0
-                    for k in 1:L-1 # k is the interspin distance
-                        if swapIndex <= L-k
-                            js[baseIndex + swapIndex] *= jSWAP/j0
+                    @timeit to "setting up mats" begin
+                        zeros!(U)
+                        zeros!(ham)
+                        currentKet .= finalKet
+                        js[:] .= @view j0s[:,i]
+                        baseIndex = 0
+                        for k in 1:L-1 # k is the interspin distance
+                            if swapIndex <= L-k
+                                js[baseIndex + swapIndex] *= jSWAP/j0
+                            end
+                            if swapIndex > (k-1) && k > 1
+                                js[baseIndex + (swapIndex - (k-1))] *= jSWAP/j0
+                            end
+                            baseIndex += L-k
                         end
-                        if swapIndex > (k-1) && k > 1
-                            js[baseIndex + (swapIndex - (k-1))] *= jSWAP/j0
-                        end
-                        baseIndex += L-k
-                    end
-                    Ham!(ham,L,jtensor,js)
+                        Ham!(ham,L,jtensor,js)
 
-                    eigenObject = eigen!(ham) 
-                    D .= Diagonal(eigenObject.values)
-                    
-                    R .= eigenObject.vectors
-                    UD .= (-im .* D .* τs[i])
+                        eigenObject = eigen!(ham) 
+                        D .= Diagonal(eigenObject.values)
+                        
+                        R .= eigenObject.vectors
+                        UD .= (-im .* D .* τs[i])
+                    end
                     @timeit to "matmuls" begin
                         diagexp!(UD) 
                         mul!(ham,UD,transpose(R)) # ham here is just used as dummy memory space, not the hamiltonian
