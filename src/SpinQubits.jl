@@ -33,7 +33,8 @@ module SpinQubits
         numJs = Int(L*(L-1)/2) # n + (n-1) + (n-2) + ... = n(n+1)/2
         js = zeros(numJs) 
         
-        sequence = singlet ? [collect(2:L-1); collect((L-1):-1:1); 1] : [collect(1:L-1);collect((L-1):-1:1)]
+        #sequence = singlet ? [collect(2:L-1); collect((L-1):-1:1); 1] : [collect(1:L-1);collect((L-1):-1:1)]
+        sequence = [collect(1:L-1);collect((L-1):-1:1)] # Made sequence same for singlet and eigenstate
 
         # Find initial ket; pre allocate resulting kets after evolution
         initKet = getInitKet(L, singlet)
