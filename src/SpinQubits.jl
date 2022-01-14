@@ -74,25 +74,28 @@ module SpinQubits
                     @timeit to "setting up mats" begin
                         zeros!(U)
                         zeros!(ham)
-                        currentKet .= finalKet
-                        js[:] .= @view j0s[:,i]
-                        baseIndex = 0
-                        for k in 1:L-1 # k is the interspin distance
-                            if swapIndex <= L-k
-                                js[baseIndex + swapIndex] *= jSWAP/j0
+                        @timeit to "updating js and ham" begin
+                            currentKet .= finalKet
+                            js[:] .= @view j0s[:,i]
+                            baseIndex = 0
+                            for k in 1:L-1 # k is the interspin distance
+                                if swapIndex <= L-k
+                                    js[baseIndex + swapIndex] *= jSWAP/j0
+                                end
+                                if swapIndex > (k-1) && k > 1
+                                    js[baseIndex + (swapIndex - (k-1))] *= jSWAP/j0
+                                end
+                                baseIndex += L-k
                             end
-                            if swapIndex > (k-1) && k > 1
-                                js[baseIndex + (swapIndex - (k-1))] *= jSWAP/j0
-                            end
-                            baseIndex += L-k
+                            Ham!(ham,L,jtensor,js)
                         end
-                        Ham!(ham,L,jtensor,js)
-
-                        eigenObject = eigen!(ham) 
-                        D .= Diagonal(eigenObject.values)
-                        
-                        R .= eigenObject.vectors
-                        UD .= (-im .* D .* τs[i])
+                        @timeit to "eigen" begin
+                            eigenObject = eigen!(ham) 
+                            D .= Diagonal(eigenObject.values)
+                            
+                            R .= eigenObject.vectors
+                            UD .= (-im .* D .* τs[i])
+                        end 
                     end
                     @timeit to "matmuls" begin
                         diagexp!(UD) 
